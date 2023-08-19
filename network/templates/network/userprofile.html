@@ -1,0 +1,74 @@
+{% extends 'network/layout.html' %}
+
+{% block title %}{{ profile_user.username }}{% endblock %}
+
+{% block body %}
+
+<div class="container my-4">
+    <h2>Profile: {{ user_profile.user.username }}</h2>
+    <p>Following: <span id="follower-count">{{ user_profile.follower_count }}</span></p>
+    <p>Followers: {{ user_profile.following_count }}</p>
+
+    {% if request.user != user_profile.user %}
+    <form action="{% url 'follow_toggle' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="username" value="{{ user_profile.user.username }}">
+        <button type="submit"
+            class="btn {% if user_profile.user in request.user.profile.followers.all %}btn-danger{% else %}btn-primary{% endif %}">
+            {% if user_profile.user in request.user.profile.followers.all %}
+            Unfollow
+            {% else %}
+            Follow
+            {% endif %}
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="container">
+
+    <div class="container my-4">
+        <h3 class="mb-4">Following Posts</h3>
+
+        {% for post in posts %}
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        {% if post.text|length > 100 %}
+                        <p class="card-title">{{ post.text|safe|truncatechars:100 }}</p>
+                        <button class="read-more-btn btn btn-primary">Read more</button>
+                        <p class="full-content" style="display: none;">{{ post.text|safe }}</p>
+                        <button class="read-less-btn" style="display: none;">Read less</button>
+                        {% else %}
+                        <p class="full-content">{{ post.text|safe }}</p>
+                        {% endif %}
+                        <hr>
+                        <b>Posted by: </b> <strong><a href="{% url 'user_profile' post.user.username %}"
+                                class="card-text">{{ post.user.username }}</a> </strong>
+
+                        <p class="card-text">Posted on: {{ post.date }}</p>
+                        <span class="like-button" data-post-id="{{ post.id }}">
+                            <i class="far fa-heart"></i> <!-- Empty heart icon -->
+                        </span>
+
+                        <p>Likes: <span class="like-count" data-post-id="{{ post.id }}">{{ post.like_count }}</span></p>
+                        {% if user == post.user %}
+                        <button class="edit-btn btn btn-danger" data-post-id="{{ post.id }}">Edit</button>
+                        {% endif %}
+                        <div id="csrf-token" data-token="{{ csrf_token }}"></div>
+
+                        <textarea class="edit-textarea form-control" data-post-id="{{ post.id }}"
+                            style="display: none; width: 700px; height: 150px;">{{ post.text }}</textarea>
+                        <button class="save-btn btn btn-success my-3" data-post-id="{{ post.id }}"
+                            style="display: none;">Save</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

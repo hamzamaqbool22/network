@@ -1,0 +1,31 @@
+{% extends 'network/layout.html' %}
+
+{% block body %}
+    <div class="container">
+
+        <div class="container my-4">
+            <h3 class="mb-4">Following Posts</h3>
+    
+            {% for post in posts %}
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ post.text }}</h5>
+                            <p class="card-text">Posted by: {{ post.user.username }}</p>
+                            <p class="card-text">Posted on: {{ post.date }}</p>
+                            <span class="like-button" data-post-id="{{ post.id }}">
+                                <i class="far fa-heart"></i> <!-- Empty heart icon -->
+                            </span>
+                            <p>Likes: <span class="like-count" data-post-id="{{ post.id }}">{{ post.like_count }}</span></p>
+                            {% if user.is_authenticated and user == post.user %}
+                            <button class="edit-button btn btn-link" data-post-id="{{ post.id }}">Edit</button>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}
